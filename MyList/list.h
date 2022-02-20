@@ -92,7 +92,7 @@ namespace lab618
             }
 
             bool isValid() {
-                return !m_pCurrent;
+                return m_pCurrent;
             }
 
         private:
@@ -142,11 +142,12 @@ namespace lab618
         T popFront()
         {
             T value = m_pBegin->data;
-            delete m_pBegin;
             if (m_pEnd == m_pBegin) {
                 m_pEnd = nullptr;
             }
-            m_pBegin = m_pBegin->pnext;
+            leaf* pnext = m_pBegin->pnext;
+            delete m_pBegin;
+            m_pBegin = pnext;
             return value;
         }
 
@@ -196,8 +197,9 @@ namespace lab618
             }
             leaf* tmp = m_pBegin;
             while (tmp != m_pEnd) {
+                leaf* pnext = tmp->pnext;
                 delete tmp;
-                tmp = tmp->pnext;
+                tmp = pnext;
             }
             delete tmp;
             m_pBegin = nullptr;
@@ -327,7 +329,7 @@ namespace lab618
             }
 
             bool isValid() {
-                return !m_pCurrent;
+                return m_pCurrent;
             }
 
         private:
@@ -353,7 +355,7 @@ namespace lab618
 
         void pushBack(T& data)
         {
-             leaf* newLeaf = new leaf(data, nullptr, nullptr);
+            leaf* newLeaf = new leaf(data, nullptr, nullptr);
             if (!m_pBegin) {
                 m_pBegin = newLeaf;
                 m_pEnd = newLeaf;
@@ -367,11 +369,12 @@ namespace lab618
         T popBack()
         {
             T value = m_pEnd->data;
-            delete m_pEnd;
             if (m_pEnd == m_pBegin) {
                 m_pBegin = nullptr;
             }
-            m_pEnd = m_pEnd->pprev;
+            leaf* pprev = m_pEnd->pprev;
+            delete m_pEnd;
+            m_pEnd = pprev;
             if (m_pEnd) {
                 m_pEnd->pnext = nullptr;
             }
@@ -394,11 +397,12 @@ namespace lab618
         T popFront()
         {
             T value = m_pBegin->data;
-            delete m_pBegin;
             if (m_pEnd == m_pBegin) {
                 m_pEnd = nullptr;
             }
-            m_pBegin = m_pBegin->pnext;
+            leaf* pnext = m_pBegin->pnext;
+            delete m_pBegin;
+            m_pBegin = pnext;
             if (m_pBegin) {
                 m_pBegin->pprev = nullptr;
             }
@@ -413,15 +417,17 @@ namespace lab618
                 it.setLeafPreBegin(it_leaf->pnext);
                 m_pBegin = m_pBegin->pnext;
             }
-            else if (it_leaf == m_pEnd) {
-                it.setLeafPostEnd(it_leaf->pprev);
-                m_pEnd = m_pEnd->pprev;
-            }
             else {
                 leaf* tmp = it_leaf->pprev;
-                tmp->pnext = it_leaf->pnext;
-                (it_leaf->pnext)->pprev = tmp;
                 it.setLeaf(tmp);
+                if (it_leaf == m_pEnd) {
+                    tmp->pnext = nullptr;
+                    m_pEnd = m_pEnd->pprev;
+                }
+                else {
+                    tmp->pnext = it_leaf->pnext;
+                    (it_leaf->pnext)->pprev = tmp;
+                }
             }
             delete it_leaf;
             if (!m_pBegin || !m_pEnd) {
@@ -476,8 +482,9 @@ namespace lab618
             }
             leaf* tmp = m_pBegin;
             while (tmp != m_pEnd) {
+                leaf* pnext = tmp->pnext;
                 delete tmp;
-                tmp = tmp->pnext;
+                tmp = pnext;
             }
             delete tmp;
             m_pBegin = nullptr;
