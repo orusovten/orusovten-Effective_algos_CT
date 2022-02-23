@@ -440,19 +440,21 @@ namespace lab618
         void eraseAndNext(CIterator& it)
         {
             leaf* it_leaf = it.getLeaf();
-            if (it_leaf == m_pBegin) {
-                it.setLeafPreBegin(it_leaf->pnext);
-                m_pBegin = m_pBegin->pnext;
-            }
-            else if (it_leaf == m_pEnd) {
+            if (it_leaf == m_pEnd) {
                 it.setLeafPostEnd(it_leaf->pprev);
                 m_pEnd = m_pEnd->pprev;
             }
             else {
                 leaf* tmp = it_leaf->pnext;
-                tmp->pprev = it_leaf->pprev;
-                (it_leaf->pprev)->pnext = tmp;
                 it.setLeaf(tmp);
+                if (it_leaf == m_pBegin) {
+                    tmp->pprev = nullptr;
+                    m_pBegin = m_pBegin->pnext;
+                }
+                else {
+                    tmp->pprev = it_leaf->pprev;
+                    (it_leaf->pprev)->pnext = tmp;
+                }
             }
             delete it_leaf;
             if (!m_pBegin || !m_pEnd) {
