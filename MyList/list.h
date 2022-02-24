@@ -1,8 +1,6 @@
 #ifndef TEMPLATES_LIST_2022_02_03
 #define TEMPLATES_LIST_2022_02_03
 
-#include <iostream>
-
 namespace lab618
 {
     template<class T>
@@ -159,7 +157,6 @@ namespace lab618
         void erase(CIterator& it)
         {
             leaf* it_leaf = it.getLeaf();
-            std::cout << it_leaf << std::endl;
             if (it_leaf == m_pBegin) {
                 it.setLeafPreBegin(it_leaf->pnext);
                 m_pBegin = m_pBegin->pnext;
