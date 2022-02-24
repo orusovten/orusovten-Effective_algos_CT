@@ -1,6 +1,8 @@
 #ifndef TEMPLATES_LIST_2022_02_03
 #define TEMPLATES_LIST_2022_02_03
 
+#include <iostream>
+
 namespace lab618
 {
     template<class T>
@@ -56,7 +58,9 @@ namespace lab618
             void operator++()
             {
                 if (!m_pBegin) {
-                    m_pCurrent = m_pCurrent->pnext;
+                    if (m_pCurrent) {
+                        m_pCurrent = m_pCurrent->pnext;
+                    }
                 } 
                 else {
                     m_pCurrent = m_pBegin;
@@ -155,6 +159,7 @@ namespace lab618
         void erase(CIterator& it)
         {
             leaf* it_leaf = it.getLeaf();
+            std::cout << it_leaf << std::endl;
             if (it_leaf == m_pBegin) {
                 it.setLeafPreBegin(it_leaf->pnext);
                 m_pBegin = m_pBegin->pnext;
@@ -271,7 +276,9 @@ namespace lab618
             void operator++()
             {
                 if (!m_pBegin) {
-                    m_pCurrent = m_pCurrent->pnext;
+                    if (m_pCurrent) {
+                        m_pCurrent = m_pCurrent->pnext;
+                    }
                 } 
                 else {
                     m_pCurrent = m_pBegin;
@@ -282,7 +289,9 @@ namespace lab618
             void operator--()
             {
                 if (!m_pEnd) {
-                    m_pCurrent = m_pCurrent->pprev;
+                    if (m_pCurrent) {
+                        m_pCurrent = m_pCurrent->pprev;
+                    }
                 } 
                 else {
                     m_pCurrent = m_pEnd;
