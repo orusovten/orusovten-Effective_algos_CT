@@ -1,5 +1,6 @@
 #ifndef MEMORY_MANAGER_HEAD_H_2022_02_17
 #define MEMORY_MANAGER_HEAD_H_2022_02_17
+#include <cstring>
 
 namespace lab618
 {
@@ -47,27 +48,48 @@ namespace lab618
                 m_pBlocks = newBlock();
                 m_pCurrentBlk = m_pBlocks;
             }
-            if (m_pCurrentBlk->usedCount < m_blkSize) 
+            if (m_pCurrentBlk->usedCount == m_blkSize) 
             {
-                T* p = m_pCurrentBlk->pdata + m_pCurrentBlk->firstFreeIndex;
-                memset(reinterpret_cast<void*>(p), 0, sizeof(T));
-                ::new(reinterpret_cast<void*>(p)) T;
-                m_pCurrentBlk->usedCount += 1;
-                // что делать с firstFreeIndex   
+                m_pCurrentBlk = m_pBlocks;
+                while (m_pCurrentBlk->pnext) 
+                {
+                    if (m_pCurrentBlk->usedCount < m_blkSize) 
+                    {
+                        break;
+                    }
+                    m_pCurrentBlk = m_pCurrentBlk->pnext;
+                }
+                // Заходим в этот if только в случае, когда все блоки заполнены
+                if (m_pCurrentBlk->usedCount == m_blkSize) 
+                {
+                    block* m_newBlock = newBlock();
+                    m_pCurrentBlk->pnext = m_newBlock;
+                    m_pCurrentBlk = m_newBlock;
+                }
             }
+            T* p = m_pCurrentBlk->pdata + m_pCurrentBlk->firstFreeIndex;
+            int* pi = reinterpret_cast<int*>(p);
+            m_pCurrentBlk->firstFreeIndex = *pi;
+            memset(reinterpret_cast<void*>(p), 0, sizeof(T));
+            ::new(reinterpret_cast<void*>(p)) T;
+            m_pCurrentBlk->usedCount += 1;
+            return p;
         }
 
         // Освободить элемент в менеджере
         bool deleteObject(T* p)
         {
             block* tmpBlock = m_pBlocks;
-            while (tmpBlock->pnext) 
+            while (tmpBlock) 
             {
                 if (p - tmpBlock->pdata < sizeof(T) * m_blkSize) 
                 {
                     p->~T();
                     memset(reinterpret_cast<void*>(p), 0, sizeof(T));
-                    // обновление firstFreeIndex и m_pCurrentBlk???
+                    int* pi = reinterpret_cast<int*>(p);
+                    *pi = tmpBlock->firstFreeIndex;
+                    tmpBlock->firstFreeIndex = (p - tmpBlock->pdata) / sizeof(T);
+                    tmpBlock->usedCount -= 1;
                     return true;
                 }
                 tmpBlock = tmpBlock->pnext;
@@ -105,9 +127,21 @@ namespace lab618
         block* newBlock()
         {
             char* pcd = new char[m_blkSize * sizeof(T)];
-            block* newBlock = new block();
-            newBlock->pdata = reinterpret_cast<T*>(pcd);
-            return newBlock;
+            block* m_newBlock = new block();
+            m_newBlock->pdata = reinterpret_cast<T*>(pcd);
+            for (int i = 0; i < m_blkSize; ++i) 
+            {
+                int* pi = reinterpret_cast<int*>(m_newBlock->pdata + i * sizeof(T));
+                if (i == m_blkSize - 1) 
+                {
+                    *pi = -1;
+                }
+                else 
+                {
+                    *pi = i + 1;
+                }
+            }
+            return m_newBlock;
         }
 
         // Освободить память блока данных. Применяется в clear
