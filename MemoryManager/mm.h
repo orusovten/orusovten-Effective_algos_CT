@@ -82,13 +82,14 @@ namespace lab618
             block* tmpBlock = m_pBlocks;
             while (tmpBlock) 
             {
-                if (p - tmpBlock->pdata < sizeof(T) * m_blkSize) 
+                std::cout << p - tmpBlock->pdata << std::endl;
+                if (p - tmpBlock->pdata < m_blkSize) 
                 {
                     p->~T();
                     memset(reinterpret_cast<void*>(p), 0, sizeof(T));
                     int* pi = reinterpret_cast<int*>(p);
                     *pi = tmpBlock->firstFreeIndex;
-                    tmpBlock->firstFreeIndex = (p - tmpBlock->pdata) / sizeof(T);
+                    tmpBlock->firstFreeIndex = p - tmpBlock->pdata;
                     tmpBlock->usedCount -= 1;
                     return true;
                 }
@@ -103,7 +104,7 @@ namespace lab618
             block* tmpBlock = m_pBlocks;
             if (!m_isDeleteElementsOnDestruct) 
             {
-                while (tmpBlock->pnext) 
+                while (tmpBlock) 
                 {
                     if (tmpBlock->usedCount > 0) 
                     {
@@ -114,7 +115,7 @@ namespace lab618
             }
             else 
             {
-                while (tmpBlock->pnext) 
+                while (tmpBlock) 
                 {
                     deleteBlock(tmpBlock);
                     tmpBlock = tmpBlock->pnext;
@@ -131,12 +132,12 @@ namespace lab618
             m_newBlock->pdata = reinterpret_cast<T*>(pcd);
             for (int i = 0; i < m_blkSize; ++i) 
             {
-                int* pi = reinterpret_cast<int*>(m_newBlock->pdata + i * sizeof(T));
+                int* pi = reinterpret_cast<int*>(m_newBlock->pdata + i);
                 if (i == m_blkSize - 1) 
                 {
                     *pi = -1;
                 }
-                else 
+                else
                 {
                     *pi = i + 1;
                 }
