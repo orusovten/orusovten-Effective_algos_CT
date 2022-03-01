@@ -82,7 +82,6 @@ namespace lab618
             block* tmpBlock = m_pBlocks;
             while (tmpBlock) 
             {
-                std::cout << p - tmpBlock->pdata << std::endl;
                 if (p - tmpBlock->pdata < m_blkSize) 
                 {
                     p->~T();
