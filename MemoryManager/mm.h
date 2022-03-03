@@ -141,12 +141,13 @@ namespace lab618
             char* pcd = new char[m_blkSize * sizeof(T)];
             block* m_newBlock = new block();
             m_newBlock->pdata = reinterpret_cast<T*>(pcd);
+            T* pp = m_newBlock->pdata;
             for (int i = 0; i < m_blkSize - 1; ++i) 
             {
-                int* pi = reinterpret_cast<int*>(m_newBlock->pdata + i);
+                int* pi = reinterpret_cast<int*>(pp + i);
                 *pi = i + 1;
             }
-            int* pi = reinterpret_cast<int*>(m_newBlock->pdata + m_blkSize - 1);
+            int* pi = reinterpret_cast<int*>(pp + m_blkSize - 1);
             *pi = -1;
             return m_newBlock;
         }
