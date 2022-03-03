@@ -48,24 +48,26 @@ namespace lab618
                 m_pBlocks = newBlock();
                 m_pCurrentBlk = m_pBlocks;
             }
-            if (m_pCurrentBlk->usedCount == m_blkSize) 
+            block* tmp = m_pCurrentBlk;
+            if (tmp->usedCount == m_blkSize) 
             {
-                m_pCurrentBlk = m_pBlocks;
-                while (m_pCurrentBlk->pnext) 
+                tmp = m_pBlocks;
+                while (tmp->pnext) 
                 {
-                    if (m_pCurrentBlk->usedCount < m_blkSize) 
+                    if (tmp->usedCount < m_blkSize) 
                     {
                         break;
                     }
-                    m_pCurrentBlk = m_pCurrentBlk->pnext;
+                    tmp = m_pCurrentBlk->pnext;
                 }
                 // Заходим в этот if только в случае, когда все блоки заполнены
-                if (m_pCurrentBlk->usedCount == m_blkSize) 
+                if (tmp->usedCount == m_blkSize) 
                 {
                     block* m_newBlock = newBlock();
-                    m_pCurrentBlk->pnext = m_newBlock;
-                    m_pCurrentBlk = m_newBlock;
+                    tmp->pnext = m_newBlock;
+                    tmp = m_newBlock;
                 }
+                m_pCurrentBlk = tmp;
             }
             T* p = m_pCurrentBlk->pdata + m_pCurrentBlk->firstFreeIndex;
             int* pi = reinterpret_cast<int*>(p);
@@ -82,13 +84,14 @@ namespace lab618
             block* tmpBlock = m_pBlocks;
             while (tmpBlock) 
             {
-                if (p - tmpBlock->pdata < m_blkSize) 
+                int diff = p - tmpBlock->pdata;
+                if (0 < diff && diff < m_blkSize) 
                 {
                     p->~T();
                     memset(reinterpret_cast<void*>(p), 0, sizeof(T));
                     int* pi = reinterpret_cast<int*>(p);
                     *pi = tmpBlock->firstFreeIndex;
-                    tmpBlock->firstFreeIndex = p - tmpBlock->pdata;
+                    tmpBlock->firstFreeIndex = diff;
                     tmpBlock->usedCount -= 1;
                     return true;
                 }
@@ -138,18 +141,13 @@ namespace lab618
             char* pcd = new char[m_blkSize * sizeof(T)];
             block* m_newBlock = new block();
             m_newBlock->pdata = reinterpret_cast<T*>(pcd);
-            for (int i = 0; i < m_blkSize; ++i) 
+            for (int i = 0; i < m_blkSize - 1; ++i) 
             {
                 int* pi = reinterpret_cast<int*>(m_newBlock->pdata + i);
-                if (i == m_blkSize - 1) 
-                {
-                    *pi = -1;
-                }
-                else
-                {
-                    *pi = i + 1;
-                }
+                *pi = i + 1;
             }
+            int* pi = reinterpret_cast<int*>(m_newBlock->pdata + m_blkSize - 1);
+            *pi = -1;
             return m_newBlock;
         }
 
