@@ -100,6 +100,9 @@ namespace lab618
         // Очистка данных, зависит от m_isDeleteElementsOnDestruct
         void clear()
         {
+            if (!m_pBlocks) {
+                return;
+            }
             block* tmpBlock = m_pBlocks;
             if (!m_isDeleteElementsOnDestruct) 
             {
@@ -116,10 +119,16 @@ namespace lab618
             {
                 while (tmpBlock) 
                 {
-                    deleteBlock(tmpBlock);
+                    block* next = tmpBlock->pnext;
+                    if (tmpBlock->usedCount > 0) 
+                    {
+                        deleteBlock(tmpBlock);
+                    }
                     tmpBlock = tmpBlock->pnext;
                 }
             }
+            m_pBlocks = nullptr;
+            m_pCurrentBlk = nullptr;
         }
     private:
 
@@ -150,6 +159,7 @@ namespace lab618
             // удаляется массив данных, а что делать с int-ами???
             char* pd = reinterpret_cast<char*>(p->pdata);
             delete[] pd;
+            delete p;
         }
 
         // Размер блока
