@@ -124,7 +124,7 @@ namespace lab618
                     {
                         deleteBlock(tmpBlock);
                     }
-                    tmpBlock = tmpBlock->pnext;
+                    tmpBlock = next;
                 }
             }
             m_pBlocks = nullptr;
