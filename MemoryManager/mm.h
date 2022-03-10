@@ -58,7 +58,7 @@ namespace lab618
                     {
                         break;
                     }
-                    tmp = m_pCurrentBlk->pnext;
+                    tmp = tmp->pnext;
                 }
                 // Заходим в этот if только в случае, когда все блоки заполнены
                 if (tmp->usedCount == m_blkSize) 
