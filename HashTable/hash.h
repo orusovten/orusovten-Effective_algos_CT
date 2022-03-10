@@ -72,6 +72,9 @@ namespace lab618
         CHash(int hashTableSize, int defaultBlockSize): 
             m_tableSize(hashTableSize), m_Memory(defaultBlockSize), m_pTable(new leaf*[hashTableSize])
         {   
+            for (int i = 0; i < hashTableSize; ++i) {
+                m_pTable[i] = nullptr;
+            }
         }
         /**
         Деструктор. Должен освобождать всю выделенную память
