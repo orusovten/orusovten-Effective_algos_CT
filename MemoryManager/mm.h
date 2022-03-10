@@ -85,7 +85,7 @@ namespace lab618
             while (tmpBlock) 
             {
                 int diff = p - tmpBlock->pdata;
-                if (0 < diff && diff < m_blkSize) 
+                if (0 <= diff && diff < m_blkSize) 
                 {
                     p->~T();
                     memset(reinterpret_cast<void*>(p), 0, sizeof(T));
