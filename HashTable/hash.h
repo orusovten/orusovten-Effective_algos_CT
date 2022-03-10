@@ -3,6 +3,8 @@
 
 #include "mm.h" // необходимо использовать свой memorymanager
 
+#include <iostream>
+
 namespace lab618
 {
     /**
