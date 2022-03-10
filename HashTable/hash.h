@@ -188,7 +188,7 @@ namespace lab618
         void addLeaf(T* pElement, unsigned int idx) {
             leaf* newLeaf = m_Memory.newObject();
             if (!newLeaf) {
-                throw CHash::CException();
+                throw CHash::CMemoryException();
             }
             newLeaf->pData = pElement;
             newLeaf->pnext = m_pTable[idx];
