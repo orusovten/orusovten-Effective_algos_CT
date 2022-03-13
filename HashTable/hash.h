@@ -72,7 +72,7 @@ namespace lab618
         Все создаваемые листики списков разрешения коллизий храним в менеджере памяти.
         */
         CHash(int hashTableSize, int defaultBlockSize): 
-            m_tableSize(hashTableSize), m_Memory(defaultBlockSize), m_pTable(new leaf*[hashTableSize])
+            m_tableSize(hashTableSize), m_Memory(defaultBlockSize, true), m_pTable(new leaf*[hashTableSize])
         {   
             for (int i = 0; i < hashTableSize; ++i) {
                 m_pTable[i] = nullptr;
@@ -139,7 +139,7 @@ namespace lab618
                 if (Compare(tmpLeaf->pData, &element) == 0) {
                     break;
                 }
-                leaf* preTmpLeaf = tmpLeaf;
+                preTmpLeaf = tmpLeaf;
                 tmpLeaf = tmpLeaf->pnext;
             }
             if (!tmpLeaf) {
@@ -147,6 +147,9 @@ namespace lab618
             }
             if (preTmpLeaf) {
                 preTmpLeaf->pnext = tmpLeaf->pnext;
+            } else {
+                // заходим сюда, только если удаляем первый элемент
+                m_pTable[idx] = tmpLeaf->pnext;
             }
             m_Memory.deleteObject(tmpLeaf);
             return true;
@@ -157,14 +160,7 @@ namespace lab618
         */
         void clear()
         {
-            for (int i = 0; i < m_tableSize; ++i) {
-                leaf* tmp = m_pTable[i];
-                while (tmp) {
-                    leaf* next = tmp->pnext;
-                    m_Memory.deleteObject(tmp);
-                    tmp = next;
-                }
-            }
+            delete[] m_pTable;
         }
     private:
         /**
