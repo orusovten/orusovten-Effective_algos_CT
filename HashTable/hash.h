@@ -3,6 +3,8 @@
 
 #include "mm.h" // необходимо использовать свой memorymanager
 
+#include <iostream>
+
 namespace lab618
 {
     /**
@@ -158,7 +160,11 @@ namespace lab618
         */
         void clear()
         {
-            delete[] m_pTable;
+            if (m_pTable) {
+                m_Memory.clear();
+                delete[] m_pTable;
+                m_pTable = nullptr;
+            }
         }
     private:
         /**
