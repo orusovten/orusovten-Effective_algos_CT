@@ -48,6 +48,6 @@ namespace templates {
     void mergeSort(void** ppArray, int length, CompareSortType pCompareFunc) {
             void** copyArray = new void*[length];
             preMergeSort(ppArray, 0, length, pCompareFunc, copyArray);
-            delete copyArray;
+            delete[] copyArray;
     }
 }
