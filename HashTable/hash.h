@@ -83,7 +83,7 @@ namespace lab618
         */
         virtual ~CHash()
         {
-            clear();                
+            clear();
             delete[] m_pTable;
             m_pTable = nullptr;
         }
@@ -157,12 +157,49 @@ namespace lab618
             return true;
         }
 
+        double avg_length() const {
+            double avg_length = 0;
+            double not_null_count = 0;
+            for (int i = 0; i < m_tableSize; ++i) {
+                leaf* tmp = m_pTable[i];
+                int length = 0;
+                while (tmp) {
+                    ++length;
+                    tmp = tmp->pnext;
+                }
+                avg_length += length;
+                if (length > 0) {
+                    ++not_null_count;
+                }
+            }
+            return avg_length / not_null_count;
+        }
+
+        int max_length() const {
+            int max_length = 0;
+            for (int i = 0; i < m_tableSize; ++i) {
+                leaf* tmp = m_pTable[i];
+                int length = 0;
+                while (tmp) {
+                    ++length;
+                    tmp = tmp->pnext;
+                }
+                if (length > max_length) {
+                    max_length = length;
+                }
+            }
+            return max_length;
+        }
+
         /**
         Удаление всех элементов. Можно вызвать в деструкторе
         */
         void clear()
         {
             m_Memory.clear();
+            for (int i = 0; i < m_tableSize; ++i) {
+                m_pTable[i] = nullptr;
+            }
         }
     private:
         /**
