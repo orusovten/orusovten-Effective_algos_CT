@@ -196,10 +196,10 @@ namespace lab618
         */
         void clear()
         {
-            m_Memory.clear();
             for (int i = 0; i < m_tableSize; ++i) {
                 m_pTable[i] = nullptr;
             }
+            m_Memory.clear();
         }
     private:
         /**
