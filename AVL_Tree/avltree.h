@@ -5,9 +5,6 @@
 
 using namespace lab618;
 
-
-#include <iostream>
-
 namespace templates
 {
     template <class T, int(*Compare)(const T *pElement, const T* pElement2) >
@@ -80,30 +77,7 @@ namespace templates
             m_Memory.clear();
         }
 
-        void print() {
-            std::cout << "tree start" << std::endl;
-            int count = 20;
-            print_Tree(m_pRoot, 0, count);
-            std::cout << "tree end" << std::endl;
-        }    
-
     private:
-
-        void print_Tree(leaf* p, int level, int& count)
-        {
-            if (p)
-            {
-                print_Tree(p->pRight,level + 1, count);
-                // count--;
-                if (count <= 0) {
-                    return;
-                }
-                for (int i = 0; i < level; ++i) std::cout << "     ";
-                std::cout << *(p->pData) << "(" << p->balanceFactor << ")" << std::endl;         
-                print_Tree(p->pLeft,level + 1, count);
-            }
-        }
-
         void do_null(leaf*& p) {
             if (!p) 
             {
