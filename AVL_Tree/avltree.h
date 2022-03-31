@@ -3,9 +3,7 @@
 
 #include "mm.h"
 
-using namespace lab618;
-
-namespace templates
+namespace lab618
 {
     template <class T, int(*Compare)(const T *pElement, const T* pElement2) >
     class CAVLTree
