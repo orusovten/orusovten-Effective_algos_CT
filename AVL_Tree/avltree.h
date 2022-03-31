@@ -82,20 +82,25 @@ namespace templates
 
         void print() {
             std::cout << "tree start" << std::endl;
-            print_Tree(m_pRoot, 0);
+            int count = 20;
+            print_Tree(m_pRoot, 0, count);
             std::cout << "tree end" << std::endl;
         }    
 
     private:
 
-        void print_Tree(leaf* p,int level)
+        void print_Tree(leaf* p, int level, int& count)
         {
             if (p)
             {
-                print_Tree(p->pRight,level + 1);
+                print_Tree(p->pRight,level + 1, count);
+                // count--;
+                if (count <= 0) {
+                    return;
+                }
                 for (int i = 0; i < level; ++i) std::cout << "     ";
                 std::cout << *(p->pData) << "(" << p->balanceFactor << ")" << std::endl;         
-                print_Tree(p->pLeft,level + 1);
+                print_Tree(p->pLeft,level + 1, count);
             }
         }
 
@@ -109,7 +114,7 @@ namespace templates
             p = nullptr;
         }
         
-        int max(int a, int b) {
+        int max_(int a, int b) {
             return a < b ? b : a;
         }
 
@@ -127,12 +132,12 @@ namespace templates
             if (m >= 0) 
             {
                 p->balanceFactor = k - 1 - m;
-                q->balanceFactor = k - 1 - max(1, k - m);
+                q->balanceFactor = k - 1 - max_(1, k - m);
             }
             else 
             {
                 p->balanceFactor = k - 1;
-                q->balanceFactor = m + k - 1 - max(1, k);
+                q->balanceFactor = m + k - 1 - max_(1, k);
             }
             return q;
         }
@@ -148,15 +153,19 @@ namespace templates
             q->pRight = p;
             int k = p->balanceFactor;
             int m = q->balanceFactor;
+            // p->balanceFactor = k + 1 - m * (m < 0);
+            // q->balanceFactor = max(k + 2 + m * (m > 0), m + 1);
             if (m <= 0) 
             {
                 p->balanceFactor = k + 1 - m;
-                q->balanceFactor = max(1, m - k) + 1 + k;
+                q->balanceFactor = max_(1, m - k) + 1 + k;
+                // max(k + 2, m + 1);
             } 
             else 
             {           
                 p->balanceFactor = k + 1;
-                q->balanceFactor = max(1, -k) + 1 + k + m;
+                q->balanceFactor = max_(1, -k) + 1 + k + m;
+                // max(k + 2 + m, m + 1);
             }
             return q;
         }
@@ -244,7 +253,7 @@ namespace templates
         
         leaf* findMin(leaf* p) // поиск узла с минимальным значением в правом поддереве
         {
-            while (p)
+            while (p->pLeft)
             {
                 p = p->pLeft;
             }
@@ -253,31 +262,41 @@ namespace templates
 
         leaf* findMax(leaf* p) // поиск узла с максимальным значением в левом поддереве
         {
-            while (p)
+            while (p->pRight)
             {
                 p = p->pRight;
             }
             return p;
         }
 
-        leaf* removeMin(leaf* p)
+        bool removeMin(leaf*& p)
         {
             if (!p->pLeft)
             {
-                return p->pRight;
+                p = p->pRight;
+                return true;
             }
-            p->pLeft = removeMin(p->pLeft);
-            return balance(p);
+            bool do_change = removeMin(p->pLeft);
+            if (do_change) {
+                p->balanceFactor += 1;
+            }
+            p = balance(p);
+            return do_change && p->balanceFactor == 0;
         }
 
-        leaf* removeMax(leaf* p)
+        bool removeMax(leaf*& p)
         {
             if (!p->pRight)
             {
-                return p->pLeft;
+                p = p->pLeft;
+                return true;
             }
-            p->pRight = removeMin(p->pRight);
-            return balance(p);
+            bool do_change = removeMax(p->pRight);
+            if (do_change) {
+                p->balanceFactor -= 1;
+            }
+            p = balance(p);
+            return do_change && p->balanceFactor == 0;
         }
 
         bool remove_in(leaf*& p, const T* pElement, bool* is_inside)
@@ -312,30 +331,44 @@ namespace templates
                 if (!r)
                 {
                     p = l;
+                    return true;
                 }
                 else if (!l)
                 {
                     p = r;
+                    return true;
                 }
                 else if (bFactor >= 0)
                 {
                     p = findMin(r);
-                    p->pRight = removeMin(r);
+                    p->balanceFactor = bFactor;
+                    do_change = removeMin(r);
+                    p->pRight = r;
+                    if (do_change) {
+                        p->balanceFactor -= 1;
+                    }
                     p->pLeft = l;
                 }
                 else
                 {
                     p = findMax(l);
-                    p->pLeft = removeMax(l);
+                    p->balanceFactor = bFactor;
+                    do_change = removeMax(l);
+                    p->pLeft = l;
+                    if (do_change) {
+                        p->balanceFactor += 1;
+                    }
                     p->pRight = r;
                 }
-                p = balance(p);
-                return true;
             }
             p = balance(p);
+            //  std::cout << "p: " << *(p->pData) << std::endl;
+            //         std::cout << "p->balanceFactor: " << (p->balanceFactor) << std::endl;
+            //         std::cout << "p->pRight: " << *(p->pRight->pData) << std::endl;
+            //         std::cout << "p->pLeft: " << *(p->pLeft->pData) << std::endl;
             return do_change && p->balanceFactor == 0;
         }
-
+        
         leaf* m_pRoot;
         CMemoryManager<leaf> m_Memory;
     };
